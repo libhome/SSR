@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>나에게 맞는 책 찾기</title>
+  <style>
+    body {
+      font-family: "Noto Sans KR", sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 760px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    .question {
+      margin-top: 30px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .buttons button {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    .buttons button:hover {
+      background: #43a047;
+    }
+    .book {
+      background: #eef2ff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    .restart {
+      margin-top: 20px;
+      background: #607d8b;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>📚 나에게 맞는 책 찾기</h1>
+  <p style="text-align:center;">질문에 답하면서 나에게 어울리는 책을 찾아보세요!</p>
+
+  <div id="content"></div>
+</div>
+
+<script>
+/* ===============================
+   사서교사 추천 도서 (KDC 기반)
+================================ */
+
+const books = [
+  { title:"아몬드", author:"손원평", mood:"고민", purpose:"나", time:"중간", style:"글" },
+  { title:"마당을 나온 암탉", author:"황선미", mood:"위로", purpose:"나", time:"짧음", style:"이야기" },
+  { title:"시간을 파는 상점", author:"김선영", mood:"생각", purpose:"재미", time:"중간", style:"글" },
+  { title:"과학 탐정단", author:"정재은", mood:"신남", purpose:"재미", time:"중간", style:"이야기" },
+  { title:"Why? 과학", author:"이광웅", mood:"신남", purpose:"알기", time:"짧음", style:"정보" }
+];
+
+/* ===============================
+   학생 선택 저장
+================================ */
+
+let step = 0;
+let choice = {};
+
+/* ===============================
+   질문 출력
+================================ */
+
+function showStep() {
+  const c = document.getElementById("content");
+
+  if (step === 0) {
+    c.innerHTML = `
+      <div class="question">💬 요즘 내 기분은 어떤가요?</div>
+      <div class="buttons">
+        <button onclick="answer('mood','신남')">신나요 😆</button>
+        <button onclick="answer('mood','위로')">조금 지쳐요 😥</button>
+        <button onclick="answer('mood','고민')">고민이 있어요 🤔</button>
+      </div>`;
+  }
+
+  else if (step === 1) {
+    c.innerHTML = `
+      <div class="question">📖 이 책을 왜 읽고 싶나요?</div>
+      <div class="buttons">
+        <button onclick="answer('purpose','재미')">재미있게 읽고 싶어요</button>
+        <button onclick="answer('purpose','알기')">새로운 걸 알고 싶어요</button>
+        <button onclick="answer('purpose','나')">나랑 비슷한 이야기를 보고 싶어요</button>
+      </div>`;
+  }
+
+  else if (step === 2) {
+    c.innerHTML = `
+      <div class="question">⏰ 얼마나 읽을 수 있나요?</div>
+      <div class="buttons">
+        <button onclick="answer('time','짧음')">조금만 읽어요</button>
+        <button onclick="answer('time','중간')">하루 한 챕터</button>
+      </div>`;
+  }
+
+  else if (step === 3) {
+    c.innerHTML = `
+      <div class="question">📚 어떤 책이 더 편해요?</div>
+      <div class="buttons">
+        <button onclick="answer('style','이야기')">이야기 중심</button>
+        <button onclick="answer('style','정보')">정보가 많은 책</button>
+        <button onclick="answer('style','글')">글이 많은 책</button>
+      </div>`;
+  }
+
+  else {
+    showResult();
+  }
+}
+
+/* ===============================
+   응답 처리
+================================ */
+
+function answer(key, value) {
+  choice[key] = value;
+  step++;
+  showStep();
+}
+
+/* ===============================
+   결과 출력
+================================ */
+
+function showResult() {
+  const c = document.getElementById("content");
+
+  const result = books.filter(b =>
+    b.mood === choice.mood &&
+    b.purpose === choice.purpose &&
+    b.time === choice.time &&
+    b.style === choice.style
+  );
+
+  c.innerHTML = `<div class="question">📚 나에게 어울리는 책</div>`;
+
+  if (result.length === 0) {
+    c.innerHTML += `<p>딱 맞는 책이 없어요. 다시 골라볼까요?</p>`;
+  } else {
+    result.slice(0,3).forEach(b => {
+      c.innerHTML += `
+        <div class="book">
+          <strong>${b.title}</strong><br>
+          저자: ${b.author}
+        </div>`;
+    });
+  }
+
+  c.innerHTML += `
+    <button class="buttons restart" onclick="restart()">🔄 다시 선택하기</button>`;
+}
+
+/* ===============================
+   다시 시작
+================================ */
+
+function restart() {
+  step = 0;
+  choice = {};
+  showStep();
+}
+
+/* 초기 실행 */
+showStep();
+</script>
+
+</body>
+</html>
